@@ -1,0 +1,17 @@
+#Ignores the database file
+myApp/instance/*.db
+
+#Ignore the models
+myApp/models/*.h5
+
+#Ignore the __pycache__ folder
+myApp/website/__pycache__
+
+#Ignore the images
+myApp/website/static/assets/images/*.png
+
+#Ignore the env folder
+env
+
+#Ignore all .DS_Store files
+.DS_Store

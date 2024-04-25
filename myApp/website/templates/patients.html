@@ -1,0 +1,135 @@
+{% extends "base.html" %} 
+{% block title %}Patient database{% endblock %} 
+{% block content%}
+<div class="container mt-5">
+    <h2 align="center">Patient Database</h2>
+    <p align="center">Current number of patients : {{num_patients}}</p>
+    {% for patient in patients.items %}
+    {% endfor %}
+    <table class="table">
+        <tr>
+            <th scope="col">Patient ID</th>
+            <th scope="col">Gender</th>
+            <th scope="col" class="age">Age</th>
+            <th scope="col" text-align="center">Number of Appointments</th>
+            <th scope="col">Diagnosis</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Details</th>
+        </tr>
+        {% for patient in patients.items %}
+            <tr>
+                <td>{{ patient.id }}</td>
+                <td>{{ patient.gender }}</td>
+                <td>
+                    {% set ns = namespace(min_age=100, max_age=0) %}
+                    {% for appointment in patient.appointments %}
+                        {% for image in appointment.images if image.patient_age %}
+                            {% if image.patient_age < ns.min_age %}
+                                {% set ns.min_age = image.patient_age %}
+                            {% endif %}
+                            {% if image.patient_age > ns.max_age %}
+                                {% set ns.max_age = image.patient_age %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if ns.min_age == ns.max_age %}
+                        {{ ns.min_age }}
+                    {% else %}
+                        {{ ns.min_age }} - {{ ns.max_age }}
+                    {% endif %}
+                </td>
+                <td class="appointmentsNum">{{ patient.appointments.count() }}</td>
+                <td>
+                    {% set ns = namespace(diagnosis_set=[]) %}
+                    {% for appointment in patient.appointments %}
+                        {% for image in appointment.images %}
+                            {% for finding in image.findings if finding.finding_label %}
+                                {% set label = finding.finding_label %}
+                                {% if label == "Pleural_Thickening" %}
+                                    {% set label = "Pleural Thickening" %}
+                                {% endif %}
+                                {% if label not in ns.diagnosis_set %}
+                                    {% set ns.diagnosis_set = ns.diagnosis_set + [label] %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if ns.diagnosis_set|length > 1 %}
+                        {{ ns.diagnosis_set[:-1]|join(', ') }} & {{ ns.diagnosis_set[-1] }}
+                    {% else %}
+                        {{ ns.diagnosis_set[0] }}
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-secondary" type="button" style="display: block; width: 100%; height: 100%;" onClick="deletePatient({{ patient.id }})">
+                        Delete
+                    </button>
+                </td>                
+                <td><a href="{{ url_for('views.patient_detail', patient_id=patient.id) }}">
+                    <button class="btn btn-secondary" type="button">
+                        Patient ID: {{ patient.id }}
+                    </button></a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+          {% if patients.has_prev %}
+              <li class="page-item">
+                  <a class="page-link" href="{{ url_for('views.patients', page=patients.prev_num) }}">Previous</a>
+              </li>
+          {% else %}
+              <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1">Previous</a>
+              </li>
+          {% endif %}
+          <li class="page-item"><a class="page-link" href="#">{{ patients.page }}</a></li>
+          {% if patients.has_next %}
+              <li class="page-item">
+                  <a class="page-link" href="{{ url_for('views.patients', page=patients.next_num) }}">Next</a>
+              </li>
+          {% else %}
+              <li class="page-item disabled">
+                  <a class="page-link" href="#">Next</a>
+              </li>
+          {% endif %}
+        </ul>
+      </nav>
+      
+</div>
+    <style>
+        .collapsible {
+          cursor: pointer;
+        }
+        
+        .content {
+          display: none;
+          overflow: hidden;
+        }
+        .appointmentsNum {
+            text-align: center;
+        }
+        .page-link {
+            color: #343a40;
+            background-color: white;
+        }
+        .container{
+            max-width: 1000px;
+        }
+        .age{
+            min-width: 75px;
+        }
+        </style>
+        <script>
+            function deletePatient(patientId) {
+                fetch("/delete-patient", {
+                  method: "POST",
+                  body: JSON.stringify({ patientId: patientId }),
+                }).then((_res) => {
+                  window.location.href = "/patients";
+                });
+              }
+        </script>
+        
+{% endblock %}

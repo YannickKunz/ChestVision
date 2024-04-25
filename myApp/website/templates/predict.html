@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Prediction{% endblock %}
+{% block content%}
+<div align="center" padding-bottom="50px">
+    <h1 align="center">Prediction</h1>
+</div>
+<div class="row" padding-top="50px">
+    <div class="col-md-6">
+        <form method="POST" action="/predict" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="follow_up_number">Follow-up #</label>
+                <input type="number" id="follow_up_number" name="follow_up_number" required onchange="checkFollowUpNumber()">
+            </div>
+            <div class="form-group" id="patient_id_group" style="display: none;">
+                <label for="patient_id">Patient ID</label>
+                <input type="number" id="patient_id" name="patient_id">
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <input type="text" id="gender" name="gender" required>
+            </div>
+            <div class="form-group">
+                <label for="group">Group</label>
+                <input type="text" id="group" name="group" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" required>
+            </div>
+            <div class="form-group">
+                <label for="view_position">View Position</label>
+                <input type="text" id="view_position" name="view_position" required>
+            </div>
+            <div class="form-group">
+                <label for="original_image_width_height">Original Image Width Height</label>
+                <input type="text" id="original_image_width_height" name="original_image_width_height" required>
+            </div>
+            <div class="form-group">
+                <label for="original_image_pixel_spacing">Original Image Pixel Spacing</label>
+                <input type="text" id="original_image_pixel_spacing" name="original_image_pixel_spacing" required>
+            </div>
+            <div class="form-group">
+                <label for="image">Upload Image</label>
+                <input type="file" id="image" name="image" accept="image/*" multiple required>
+            </div>
+            <button type="submit" class="btn btn-primary">Predict</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        {% if myfile %}
+            <img src="{{ url_for('static', filename='assets/images/' + myfile) }}" alt="Image" class="img-fluid">
+        {% else %}
+            <img src="{{ url_for('static', filename='assets/placeholder-256x256.gif') }}" alt="Placeholder Image" class="img-fluid">
+        {% endif %}
+    </div>    
+</div>
+<div class="container mt-5">
+    {% if prediction_texts %}
+    <div class="result">
+        <h2>Prediction Results:</h2>
+        <ul>
+            {% for prediction_text in prediction_texts %}
+            <li class="{% if 'No Finding' in prediction_text %}no-finding{% else %}{{ prediction_text.lower().replace(' ', '-') }}{% endif %}">{{ prediction_text }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+<style>
+    .container mt-5{
+        max-width: 400px;
+    }
+    .container {
+        max-width: 1000px;
+    }
+    .result {
+        border: 1px solid #ccc;
+        padding: 20px;
+    }
+    .result li {
+        list-style: none;
+        margin-bottom: 10px;
+    }
+    .result .no-finding {
+        color: green;
+    }
+    /* Add styles for other diseases as needed */
+</style>
+<script>
+    function checkFollowUpNumber() {
+        var followUpNumber = document.getElementById('follow_up_number').value;
+        if (followUpNumber > 0) {
+            document.getElementById('patient_id_group').style.display = 'block';
+        } else {
+            document.getElementById('patient_id_group').style.display = 'none';
+        }
+    }  
+
+    </script>
+{% endblock %}
+

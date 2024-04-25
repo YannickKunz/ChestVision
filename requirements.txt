@@ -1,0 +1,9 @@
+tensorflow==2.13.0
+Matplotlib
+Typing-extensions
+opencv_python
+SQLAlchemy
+Flask
+Flask-sqlalchemy
+Flask-login
+Flask-migrate

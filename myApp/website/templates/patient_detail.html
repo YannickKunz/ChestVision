@@ -1,0 +1,63 @@
+{% extends "base.html" %} 
+{% block title %}Patient Details{% endblock %} 
+{% block content%}
+<div class="container">
+    {% set diag = [] %}
+    <h2>Patient ID: {{ patient.id }}</h2>
+    <p>Gender: {{ patient.gender }}</p>
+    <button type="button" class="button-84" onClick="deletePatient({{ patient.id }})">Delete Patient</button>
+      </button>
+    {% for appointment in patient.appointments %}
+        <div class="card mt-3">
+            <div class="card-header">
+                Follow-up #{{ appointment.follow_up_number }}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="card-title">Appointment ID: {{ appointment.id }}</h5>
+                        <p class="card-text">Group: {{ appointment.group }}</p>
+                        {% set myns = namespace(diag=[]) %}
+                        {% for image in appointment.images %}
+                            <h6>Image ID: {{ image.id }}</h6>
+                            <p>Age: {{ image.patient_age }}</p>
+                            <p>View Position: {{ image.view_position }}</p>
+                            <p>Original Image Width Height: {{ image.original_image_width_height }}</p>
+                            <p>Original Image Pixel Spacing: {{ image.original_image_pixel_spacing }}</p>
+                            {% for finding in image.findings if finding.finding_label %}
+                                {% set myns.diag = myns.diag + [finding.finding_label] %}
+                            {% endfor %}
+                            {% if myns.diag|length > 1 %}
+                                {{ myns.diag[:-1]|join(', ') }} & {{ myns.diag[-1] }}
+                            {% else %}
+                                {{ myns.diag[0] }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {% for image in appointment.images %}
+                            <img src="{{ url_for('static', filename='assets/images/' + image.image_index) }}" alt="Image for appointment {{ appointment.id }}">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<style>
+    .container {
+        max-width: 1000px;
+    }
+</style>
+
+<script>
+    function deletePatient(patientId) {
+        fetch("/delete-patient", {
+          method: "POST",
+          body: JSON.stringify({ patientId: patientId }),
+        }).then((_res) => {
+          window.location.href = "/patients";
+        });
+      }
+</script>
+{% endblock %}

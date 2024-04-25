@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}ChestVision{% endblock %}
+{% block content%}
+<div class="container mt-5">
+    <h1 align="center">Welcome to ChestVision</h1>
+</div>
+<div class="container mt-5" align="center" padding-bottom="50px">
+  <h2 align="center">Predictions</h2>
+<form action="/predictions" method="POST" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="image">Upload Image</label>
+    <input type="file" id="image" name="image" accept="image/*" multiple required>
+    <button type="submit" class="button-84">Predict</button>
+  </div>
+</form>
+<!-- <div class="col-md-6">
+  {% if myfile %}
+      <img src="{{ url_for('static', filename='assets/images/' + myfile) }}" alt="Image" class="img-fluid">
+  {% else %}
+      <img src="{{ url_for('static', filename='assets/placeholder-256x256.gif') }}" alt="Placeholder Image" class="img-fluid">
+  {% endif %}
+</div>  -->
+  {% if prediction_texts %}
+  <div class="result">
+      <h2>Prediction Results:</h2>
+      <ul>
+          {% for prediction_text in prediction_texts %}
+          <li>{{ prediction_text }}</li>
+          {% endfor %}
+      </ul>
+  </div>
+</div>
+  {% endif %}
+  <img src="{{ url_for('static', filename='assets/uploaded_images/predictions.png') }}" alt="Predictions" class="img-fluid">
+</div>
+
+<style>
+  .container mt-5{
+      max-width: 400px;
+  }
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+.form-group {
+    text-align: center;
+}
+.btn-primary {
+    width: 25%;
+    background-color: #007bff;
+    margin-left: 200px;
+    margin-top: 20px;
+    border-color: #007bff;
+    align-items: center;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.result {
+    text-align: center;
+    margin-top: 20px;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+}
+.pneumonia {
+  background-color: #ff6b6b;
+  border-color: #ff5252;
+  color: #fff;
+}
+.no-pneumonia {
+  background-color: #4caf50;
+  border-color: #43a047;
+  color: #fff;
+}
+</style>
+{% endblock %}
