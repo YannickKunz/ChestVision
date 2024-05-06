@@ -431,3 +431,13 @@ Works with python 3.10.10
 pip list  
 pip install -r requirements.txt  
 pip freeze > requirements.txt  
+
+##### Install python 3.10 on MacOs and run the app in a python 3.10 env
+
+brew install python@3.10  
+python3.10 -m venv env  
+source env/bin/activate  
+pip3.10 install -r requirements.txt  
+cd myApp  
+python3.10 main.py  
+deactivate  
